@@ -1,0 +1,109 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class DynamicArray {
+  - string* data
+  - int size
+  - int capacity
+  - ensureCapacity(int)
+  + DynamicArray(int)
+  + pushBack(string)
+  + popBack()
+  + get(int) : string
+  + set(int, string)
+  + removeAt(int)
+  + getSize() : int
+  + print()
+}
+
+class SinglyList {
+  - Node* head
+  - Node* tail
+  - int size
+  + SinglyList()
+  + pushFront(string)
+  + pushBack(string)
+  + popFront()
+  + popBack()
+  + find(string) : bool
+  + remove(string)
+  + getSize() : int
+  + get(int) : string
+  + print()
+}
+
+class DoublyList {
+  - Node* head
+  - Node* tail
+  - int size
+  + DoublyList()
+  + pushFront(string)
+  + pushBack(string)
+  + popFront()
+  + popBack()
+  + find(string) : bool
+  + remove(string)
+  + getSize() : int
+}
+
+class Stack {
+  - Node* head
+  - int count
+  + Stack()
+  + push(string)
+  + pop()
+  + peek() : string
+  + size() : int
+  + isEmpty() : bool
+}
+
+class Queue {
+  - Node* head
+  - Node* tail
+  - int count
+  + Queue()
+  + push(string)
+  + pop()
+  + front() : string
+  + size() : int
+  + isEmpty() : bool
+}
+
+class HashTable {
+  - Node*[1009] buckets
+  - int count
+  - hashString(string) : int
+  + HashTable()
+  + add(string)
+  + remove(string)
+  + contains(string) : bool
+  + size() : int
+}
+
+class CompleteBinaryTree {
+  - TreeNode* root
+  - int count
+  - deleteTree(TreeNode*)
+  + CompleteBinaryTree()
+  + insert(int)
+  + find(int) : bool
+  + isComplete() : bool
+  + size() : int
+}
+
+class Serializer {
+  + {static} saveBinary(DynamicArray, string)
+  + {static} loadBinary(string) : DynamicArray
+}
+
+class TextSerializer {
+  + {static} saveText(SinglyList, string)
+  + {static} loadText(string) : SinglyList
+}
+
+DynamicArray ..> Serializer
+SinglyList ..> TextSerializer
+
+note right of Serializer : Бинарная сериализация
+note right of TextSerializer : Текстовая сериализация
+@enduml

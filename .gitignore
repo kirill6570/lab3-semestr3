@@ -1,0 +1,11 @@
+lab3/build/
+lab3-go/lab3
+*.o
+*.gcda
+*.gcno
+coverage.out
+coverage.html
+cppcheck_report.txt
+test_arr.bin
+test_list.txt
+.vscode/
