@@ -54,6 +54,56 @@ TEST(DynamicArrayTest, OutOfBounds) {
     EXPECT_EQ(arr.get(-1), "");
     EXPECT_EQ(arr.get(100), "");
 }
+TEST(DynamicArrayTest, MoveSemantics) {
+    DynamicArray arr1;
+    arr1.pushBack("hello");
+    arr1.pushBack("world");
+    
+    DynamicArray arr2(std::move(arr1));
+    EXPECT_EQ(arr2.getSize(), 2);
+    EXPECT_EQ(arr1.getSize(), 0); 
+    
+    DynamicArray arr3;
+    arr3 = std::move(arr2);
+    EXPECT_EQ(arr3.getSize(), 2);
+    EXPECT_EQ(arr2.getSize(), 0);
+}
+TEST(DynamicArrayTest, SetRemoveAndBounds) {
+    DynamicArray arr;
+    arr.pushBack("test");
+    arr.set(5, "fail");
+    arr.removeAt(5);
+    arr.get(5);
+    EXPECT_EQ(arr.getSize(), 1); 
+    arr.set(0, "new_test");
+    EXPECT_EQ(arr.get(0), "new_test");
+    
+    arr.removeAt(0);
+    EXPECT_EQ(arr.getSize(), 0);
+}
+
+TEST(DynamicArrayTest, MoveAssignmentAndEnsureCapacity) {
+    DynamicArray arr1;
+    for (int i = 0; i < 10; ++i) {
+        arr1.pushBack("item");
+    }
+    EXPECT_EQ(arr1.getSize(), 10); 
+    DynamicArray arr2;
+    arr2 = std::move(arr1);
+    EXPECT_EQ(arr2.getSize(), 10);
+    EXPECT_EQ(arr1.getSize(), 0); 
+}
+
+TEST(DynamicArrayTest, PrintCoverage) {
+    DynamicArray arr;
+    arr.print(); 
+    
+    arr.pushBack("A");
+    arr.pushBack("B");
+    arr.print();
+    
+    EXPECT_EQ(arr.getSize(), 2);
+}
 
 // ===== SinglyList =====
 TEST(SinglyListTest, InitiallyEmpty) {
