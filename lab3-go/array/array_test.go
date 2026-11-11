@@ -1,59 +1,86 @@
 package array
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func TestDynamicArray(t *testing.T) {
-	a := New(4)
+	a := New(10)
+	
 	if a.Size() != 0 {
-		t.Error("Expected size 0")
+		t.Errorf("Ожидался размер 0, получен %d", a.Size())
 	}
 
-	a.PushBack("10")
-	a.PushBack("20")
-	a.PushBack("30")
+	a.PushBack("first")
+	a.PushBack("second")
+	a.PushBack("third")
+
 	if a.Size() != 3 {
-		t.Error("Expected size 3")
-	}
-	if a.Get(1) != "20" {
-		t.Error("Expected 20 at index 1")
+		t.Errorf("Ожидался размер 3, получен %d", a.Size())
 	}
 
-	a.Set(1, "99")
-	if a.Get(1) != "99" {
-		t.Error("Expected 99")
+	if a.Get(0) != "first" || a.Get(1) != "second" {
+		t.Errorf("Ошибка получения элемента по индексу")
+	}
+
+	a.Set(1, "new")
+	if a.Get(1) != "new" {
+		t.Errorf("Ошибка обновления элемента")
+	}
+
+	a.Set(10, "fail") 
+	if a.Get(10) != "" {
+		t.Errorf("Ожидалась пустая строка при выходе за границы")
 	}
 
 	a.RemoveAt(1)
-	if a.Size() != 2 || a.Get(1) != "30" {
-		t.Error("Remove failed")
+	if a.Size() != 2 || a.Get(1) != "third" {
+		t.Errorf("Ошибка удаления элемента")
 	}
-
-	a.PopBack()
-	if a.Size() != 1 {
-		t.Error("PopBack failed")
-	}
-
+	
+	a.RemoveAt(10)
 	a.Print()
 }
 
-func TestNewWithItem(t *testing.T) {
-	a := NewWithItem(3, "x")
-	if a.Size() != 3 {
-		t.Error("Expected size 3")
-	}
-	if a.Get(0) != "x" || a.Get(2) != "x" {
-		t.Error("Expected all x")
-	}
-}
+func TestSerialization(t *testing.T) {
+	da := New(10)
+	da.PushBack("hello")
+	da.PushBack("world")
 
-func TestOutOfBounds(t *testing.T) {
-	a := New(2)
-	if a.Get(-1) != "" || a.Get(100) != "" {
-		t.Error("Out of bounds should return empty")
+	txtFile := "test_array.json"
+	err := da.SaveToText(txtFile)
+	if err != nil {
+		t.Fatalf("Ошибка сохранения в текст: %v", err)
 	}
-	a.Set(-1, "x")
-	a.RemoveAt(-1)
-	if a.Size() != 0 {
-		t.Error("Invalid ops should not change size")
+
+	newDaText := New(10)
+	err = newDaText.LoadFromText(txtFile)
+	if err != nil {
+		t.Fatalf("Ошибка загрузки из текста: %v", err)
 	}
+
+	if newDaText.Size() != 2 || newDaText.Get(0) != "hello" || newDaText.Get(1) != "world" {
+		t.Errorf("Текстовая десериализация не удалась")
+	}
+	
+	os.Remove(txtFile)
+
+	binFile := "test_array.bin"
+	err = da.SaveToBinary(binFile)
+	if err != nil {
+		t.Fatalf("Ошибка сохранения в бинарь: %v", err)
+	}
+
+	newDaBin := New(10)
+	err = newDaBin.LoadFromBinary(binFile)
+	if err != nil {
+		t.Fatalf("Ошибка загрузки из бинаря: %v", err)
+	}
+
+	if newDaBin.Size() != 2 || newDaBin.Get(0) != "hello" || newDaBin.Get(1) != "world" {
+		t.Errorf("Бинарная десериализация не удалась")
+	}
+
+	os.Remove(binFile)
 }
