@@ -1,6 +1,9 @@
 package tree
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func TestCBT(t *testing.T) {
 	tr := New()
@@ -29,4 +32,37 @@ func TestCBT(t *testing.T) {
 	}
 
 	tr.PrintByLevels()
+}
+
+func TestTreeSerialization(t *testing.T) {
+	tr := New()
+	tr.Insert(10)
+	tr.Insert(20)
+	tr.Insert(30)
+
+
+	if err := tr.SaveToText("tree.json"); err != nil {
+		t.Fatalf("Text save error: %v", err)
+	}
+	newTr := New()
+	if err := newTr.LoadFromText("tree.json"); err != nil {
+		t.Fatalf("Text load error: %v", err)
+	}
+	if newTr.Size() != 3 {
+		t.Errorf("Expected size 3, got %d", newTr.Size())
+	}
+	os.Remove("tree.json")
+
+	// Бинарь
+	if err := tr.SaveToBinary("tree.bin"); err != nil {
+		t.Fatalf("Binary save error: %v", err)
+	}
+	newTrb := New()
+	if err := newTrb.LoadFromBinary("tree.bin"); err != nil {
+		t.Fatalf("Binary load error: %v", err)
+	}
+	if newTrb.Size() != 3 {
+		t.Errorf("Expected size 3, got %d", newTrb.Size())
+	}
+	os.Remove("tree.bin")
 }

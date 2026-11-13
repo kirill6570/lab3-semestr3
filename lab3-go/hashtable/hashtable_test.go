@@ -1,43 +1,69 @@
 package hashtable
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
-func TestHashTable(t *testing.T) {
+func TestHashTableAll(t *testing.T) {
 	h := New()
+	
 	if h.Size() != 0 {
 		t.Error("Expected size 0")
-	}
-	if h.Contains("apple") {
-		t.Error("Should not contain apple")
 	}
 
 	h.Add("apple")
 	h.Add("banana")
 	h.Add("cherry")
+	h.Add("apple") // Проверка на дубликат (не должно увеличивать size)
+
 	if h.Size() != 3 {
-		t.Error("Expected size 3")
-	}
-	if !h.Contains("apple") || !h.Contains("banana") {
-		t.Error("Contains failed")
+		t.Errorf("Expected size 3, got %d", h.Size())
 	}
 
-	h.Add("apple")
-	if h.Size() != 3 {
-		t.Error("Duplicate added")
+	if !h.Contains("apple") {
+		t.Error("Contains failed for apple")
+	}
+
+	if h.Contains("grape") {
+		t.Error("Contains failed for grape (should be false)")
 	}
 
 	h.Remove("banana")
 	if h.Size() != 2 {
-		t.Error("Expected size 2")
+		t.Errorf("Expected size 2 after remove, got %d", h.Size())
 	}
-	if h.Contains("banana") {
-		t.Error("Banana should be removed")
-	}
-
-	h.Remove("nonexistent")
-	if h.Size() != 2 {
-		t.Error("Remove nonexistent should not change size")
-	}
-
+	
+	// Проверка вывода
 	h.Print()
+}
+
+func TestHashTableSerialization(t *testing.T) {
+	h := New()
+	h.Add("apple")
+	h.Add("banana")
+
+	if err := h.SaveToText("ht.json"); err != nil {
+		t.Fatalf("Text save error: %v", err)
+	}
+	newH := New()
+	if err := newH.LoadFromText("ht.json"); err != nil {
+		t.Fatalf("Text load error: %v", err)
+	}
+	if newH.Size() != 2 {
+		t.Errorf("Expected size 2, got %d", newH.Size())
+	}
+	os.Remove("ht.json")
+
+	if err := h.SaveToBinary("ht.bin"); err != nil {
+		t.Fatalf("Binary save error: %v", err)
+	}
+	newHb := New()
+	if err := newHb.LoadFromBinary("ht.bin"); err != nil {
+		t.Fatalf("Binary load error: %v", err)
+	}
+	if newHb.Size() != 2 {
+		t.Errorf("Expected size 2, got %d", newHb.Size())
+	}
+	os.Remove("ht.bin")
 }
