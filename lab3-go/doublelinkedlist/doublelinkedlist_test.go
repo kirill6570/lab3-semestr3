@@ -7,8 +7,7 @@ import (
 
 func TestDoubleLinkedListAll(t *testing.T) {
 	l := New()
-	
-	// Печать пустого
+
 	l.PrintForward()
 	l.PrintBackward()
 
@@ -16,7 +15,6 @@ func TestDoubleLinkedListAll(t *testing.T) {
 		t.Error("Expected size 0")
 	}
 
-	// Добавление
 	l.PushBack("A")
 	l.PushBack("B")
 	l.PushFront("C")
@@ -28,13 +26,22 @@ func TestDoubleLinkedListAll(t *testing.T) {
 	l.PrintForward()
 	l.PrintBackward()
 
-	l.RemoveValue("B") // из середины
-	l.RemoveValue("C") // из начала
-	l.RemoveValue("A") // из конца
-	l.RemoveValue("X") // несуществующий
+	l.RemoveValue("X")
+	l.RemoveValue("C")
+	l.RemoveValue("A")
+	l.RemoveValue("B")
 
-	// Pop на пустом
 	l.PopFront()
+	l.PopBack()
+
+	l.PushBack("E")
+	l.PushFront("F")
+
+	l.PopFront()
+	l.PopFront()
+
+	l.PushBack("G")
+	l.PopBack()
 	l.PopBack()
 
 	if l.Size() != 0 {
@@ -70,4 +77,9 @@ func TestDoubleLinkedListSerialization(t *testing.T) {
 		t.Errorf("Expected size 2, got %d", newLb.Size())
 	}
 	os.Remove("dl.bin")
+
+	newErrText := New()
+	_ = newErrText.LoadFromText("non_existent.json")
+	newErrBin := New()
+	_ = newErrBin.LoadFromBinary("non_existent.bin")
 }

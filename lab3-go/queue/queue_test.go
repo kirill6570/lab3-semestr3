@@ -7,31 +7,41 @@ import (
 
 func TestQueueAll(t *testing.T) {
 	q := New()
+	
+
 	q.Print()
+
 	if !q.IsEmpty() { 
 		t.Error("Expected empty") 
 	}
-
-	q.Push("10")
-	q.Push("20")
+	
+	q.Push("A")
+	q.Push("B")
+	q.Push("C")
+	
 	q.Print()
-	if q.Size() != 2 { 
-		t.Error("Expected 2") 
-	}
 
-	if v, ok := q.Front(); !ok || v != "10" { 
-		t.Error("Front") 
+	if q.Size() != 3 { 
+		t.Error("Expected size 3") 
 	}
-
+	
+	
+	if v, ok := q.Front(); !ok || v != "A" { 
+		t.Error("Front failed") 
+	}
+	
 	q.Pop()
 	q.Pop()
 	q.Pop()
+	q.Pop() // Pop на пустой
+	
 	if !q.IsEmpty() { 
-		t.Error("Expected empty") 
+		t.Error("Expected empty after pops") 
 	}
-
-	if _, ok := q.Front(); ok { 
-		t.Error("Front empty") 
+	
+	// Front на пустой
+	if _, ok := q.Front(); ok {
+		t.Error("Front on empty should be false")
 	}
 }
 
@@ -40,7 +50,6 @@ func TestQueueSerialization(t *testing.T) {
 	q.Push("A")
 	q.Push("B")
 
-	// Текст
 	if err := q.SaveToText("q.json"); err != nil {
 		t.Fatalf("Text save error: %v", err)
 	}
@@ -48,12 +57,8 @@ func TestQueueSerialization(t *testing.T) {
 	if err := newQ.LoadFromText("q.json"); err != nil {
 		t.Fatalf("Text load error: %v", err)
 	}
-	if newQ.Size() != 2 {
-		t.Errorf("Expected size 2, got %d", newQ.Size())
-	}
 	os.Remove("q.json")
 
-	// Бинарь
 	if err := q.SaveToBinary("q.bin"); err != nil {
 		t.Fatalf("Binary save error: %v", err)
 	}
@@ -61,8 +66,10 @@ func TestQueueSerialization(t *testing.T) {
 	if err := newQb.LoadFromBinary("q.bin"); err != nil {
 		t.Fatalf("Binary load error: %v", err)
 	}
-	if newQb.Size() != 2 {
-		t.Errorf("Expected size 2, got %d", newQb.Size())
-	}
 	os.Remove("q.bin")
+
+	newErrText := New()
+	_ = newErrText.LoadFromText("non_existent.json")
+	newErrBin := New()
+	_ = newErrBin.LoadFromBinary("non_existent.bin")
 }

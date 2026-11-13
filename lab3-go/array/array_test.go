@@ -6,7 +6,7 @@ import (
 )
 
 func TestDynamicArray(t *testing.T) {
-	a := New(0)
+	a := New(10)
 	if a.Size() != 0 {
 		t.Error("Expected size 0")
 	}
@@ -27,7 +27,6 @@ func TestDynamicArray(t *testing.T) {
 		t.Error("Set failed")
 	}
 
-	// Выход за границы
 	a.Set(10, "fail")
 	a.Get(10)
 	a.Get(-1)
@@ -41,14 +40,12 @@ func TestDynamicArray(t *testing.T) {
 
 	a.PopBack()
 	a.PopBack()
-	a.PopBack() // на пустом
+	a.PopBack()
 	if a.Size() != 0 {
 		t.Error("Expected empty")
 	}
 
 	a.Print()
-
-	// Проверяем Print на заполненном
 	a.PushBack("A")
 	a.Print()
 }
@@ -58,7 +55,6 @@ func TestNewWithItem(t *testing.T) {
 	if a.Size() != 3 {
 		t.Errorf("Expected size 3, got %d", a.Size())
 	}
-	
 	b := NewWithItem(-5, "y")
 	if b.Size() != 1 {
 		t.Errorf("Expected size 1, got %d", b.Size())
@@ -97,9 +93,10 @@ func TestSerialization(t *testing.T) {
 		t.Error("Binary load failed")
 	}
 	os.Remove(binFile)
+
+
 	newErrText := New(10)
 	_ = newErrText.LoadFromText("non_existent.json")
-	
 	newErrBin := New(10)
 	_ = newErrBin.LoadFromBinary("non_existent.bin")
 }
