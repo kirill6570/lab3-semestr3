@@ -7,10 +7,16 @@ import (
 
 func TestDoubleLinkedListAll(t *testing.T) {
 	l := New()
+	
+	// Печать пустого
+	l.PrintForward()
+	l.PrintBackward()
+
 	if l.Size() != 0 {
 		t.Error("Expected size 0")
 	}
 
+	// Добавление
 	l.PushBack("A")
 	l.PushBack("B")
 	l.PushFront("C")
@@ -22,18 +28,18 @@ func TestDoubleLinkedListAll(t *testing.T) {
 	l.PrintForward()
 	l.PrintBackward()
 
-	l.RemoveValue("B")
+	l.RemoveValue("B") // из середины
+	l.RemoveValue("C") // из начала
+	l.RemoveValue("A") // из конца
+	l.RemoveValue("X") // несуществующий
+
+	// Pop на пустом
 	l.PopFront()
 	l.PopBack()
 
-	// В твоем коде нет метода IsEmpty, поэтому проверяем через Size
 	if l.Size() != 0 {
 		t.Error("Expected size 0 after removing all")
 	}
-	
-	// Проверка вывода пустого списка
-	l.PrintForward()
-	l.PrintBackward()
 }
 
 func TestDoubleLinkedListSerialization(t *testing.T) {
@@ -41,7 +47,6 @@ func TestDoubleLinkedListSerialization(t *testing.T) {
 	l.PushBack("A")
 	l.PushBack("B")
 
-	// Текст
 	if err := l.SaveToText("dl.json"); err != nil {
 		t.Fatalf("Text save error: %v", err)
 	}
@@ -54,7 +59,6 @@ func TestDoubleLinkedListSerialization(t *testing.T) {
 	}
 	os.Remove("dl.json")
 
-	// Бинарь
 	if err := l.SaveToBinary("dl.bin"); err != nil {
 		t.Fatalf("Binary save error: %v", err)
 	}

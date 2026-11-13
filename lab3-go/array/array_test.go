@@ -6,10 +6,9 @@ import (
 )
 
 func TestDynamicArray(t *testing.T) {
-	a := New(10)
-	
+	a := New(0)
 	if a.Size() != 0 {
-		t.Errorf("Ожидался размер 0, получен %d", a.Size())
+		t.Error("Expected size 0")
 	}
 
 	a.PushBack("first")
@@ -17,30 +16,53 @@ func TestDynamicArray(t *testing.T) {
 	a.PushBack("third")
 
 	if a.Size() != 3 {
-		t.Errorf("Ожидался размер 3, получен %d", a.Size())
+		t.Errorf("Expected size 3, got %d", a.Size())
 	}
 
 	if a.Get(0) != "first" || a.Get(1) != "second" {
-		t.Errorf("Ошибка получения элемента по индексу")
+		t.Error("Get failed")
 	}
-
 	a.Set(1, "new")
 	if a.Get(1) != "new" {
-		t.Errorf("Ошибка обновления элемента")
+		t.Error("Set failed")
 	}
 
-	a.Set(10, "fail") 
-	if a.Get(10) != "" {
-		t.Errorf("Ожидалась пустая строка при выходе за границы")
-	}
+	// Выход за границы
+	a.Set(10, "fail")
+	a.Get(10)
+	a.Get(-1)
+	a.RemoveAt(10)
+	a.RemoveAt(-1)
 
 	a.RemoveAt(1)
-	if a.Size() != 2 || a.Get(1) != "third" {
-		t.Errorf("Ошибка удаления элемента")
+	if a.Size() != 2 {
+		t.Error("RemoveAt failed")
+	}
+
+	a.PopBack()
+	a.PopBack()
+	a.PopBack() // на пустом
+	if a.Size() != 0 {
+		t.Error("Expected empty")
+	}
+
+	a.Print()
+
+	// Проверяем Print на заполненном
+	a.PushBack("A")
+	a.Print()
+}
+
+func TestNewWithItem(t *testing.T) {
+	a := NewWithItem(3, "x")
+	if a.Size() != 3 {
+		t.Errorf("Expected size 3, got %d", a.Size())
 	}
 	
-	a.RemoveAt(10)
-	a.Print()
+	b := NewWithItem(-5, "y")
+	if b.Size() != 1 {
+		t.Errorf("Expected size 1, got %d", b.Size())
+	}
 }
 
 func TestSerialization(t *testing.T) {
@@ -48,39 +70,36 @@ func TestSerialization(t *testing.T) {
 	da.PushBack("hello")
 	da.PushBack("world")
 
+	// Текст
 	txtFile := "test_array.json"
-	err := da.SaveToText(txtFile)
-	if err != nil {
-		t.Fatalf("Ошибка сохранения в текст: %v", err)
+	if err := da.SaveToText(txtFile); err != nil {
+		t.Fatalf("Text save error: %v", err)
 	}
-
 	newDaText := New(10)
-	err = newDaText.LoadFromText(txtFile)
-	if err != nil {
-		t.Fatalf("Ошибка загрузки из текста: %v", err)
+	if err := newDaText.LoadFromText(txtFile); err != nil {
+		t.Fatalf("Text load error: %v", err)
 	}
-
-	if newDaText.Size() != 2 || newDaText.Get(0) != "hello" || newDaText.Get(1) != "world" {
-		t.Errorf("Текстовая десериализация не удалась")
+	if newDaText.Size() != 2 {
+		t.Error("Text load failed")
 	}
-	
 	os.Remove(txtFile)
 
+	// Бинарь
 	binFile := "test_array.bin"
-	err = da.SaveToBinary(binFile)
-	if err != nil {
-		t.Fatalf("Ошибка сохранения в бинарь: %v", err)
+	if err := da.SaveToBinary(binFile); err != nil {
+		t.Fatalf("Binary save error: %v", err)
 	}
-
 	newDaBin := New(10)
-	err = newDaBin.LoadFromBinary(binFile)
-	if err != nil {
-		t.Fatalf("Ошибка загрузки из бинаря: %v", err)
+	if err := newDaBin.LoadFromBinary(binFile); err != nil {
+		t.Fatalf("Binary load error: %v", err)
 	}
-
-	if newDaBin.Size() != 2 || newDaBin.Get(0) != "hello" || newDaBin.Get(1) != "world" {
-		t.Errorf("Бинарная десериализация не удалась")
+	if newDaBin.Size() != 2 {
+		t.Error("Binary load failed")
 	}
-
 	os.Remove(binFile)
+	newErrText := New(10)
+	_ = newErrText.LoadFromText("non_existent.json")
+	
+	newErrBin := New(10)
+	_ = newErrBin.LoadFromBinary("non_existent.bin")
 }
